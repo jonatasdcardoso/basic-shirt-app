@@ -20,7 +20,7 @@ public class Produto {
     private BigDecimal preco;
     private Integer estoque;
 
-    @ManyToOne 
+    @ManyToOne // relacionamento de N para 1.
     private Categoria categoria;
 
     public Produto() {
@@ -45,6 +45,27 @@ public class Produto {
     }
     public String getDescricao(){
         return descricao;
+    }
+    public void setDescricao(String descricao){
+        this.descricao = descricao;
+    }
+    public BigDecimal getPreco() {
+        return preco;
+    }
+    public void setPreco(BigDecimal preco){
+        this.preco = preco;
+    }
+    public Integer getEstoque(){
+        return estoque;
+    }
+    public void setEstoque(Integer estoque){
+        this.estoque = estoque;
+    }
+    public Categoria getCategoria() {
+        return categoria;
+    }
+    public void setCategoria(Categoria categoria){
+        this.categoria = categoria;
     }
 
 }
