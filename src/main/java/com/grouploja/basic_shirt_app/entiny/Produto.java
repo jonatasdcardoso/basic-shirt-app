@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
 
@@ -17,10 +18,12 @@ public class Produto {
     private Long id;
     private String nome;
     private String descricao;
-    private BigDecimal preco;
     private Integer estoque;
 
-    @ManyToOne // relacionamento de N para 1.
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal preco;
+
+    @ManyToOne (optional = false)// relacionamento de N para 1.
     private Categoria categoria;
 
     public Produto() {

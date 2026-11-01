@@ -17,8 +17,17 @@ public class CategoriaServico {
     public CategoriaServico(CategoriaRepositorio categoriaRespositorio) {
         this.categoriaRepositorio = categoriaRespositorio;
     }
+    private void validarCategoria(Categoria categoria) {
+
+        if (categoria.getNome() == null ||
+            categoria.getNome().isBlank()) {
+
+            throw new IllegalArgumentException("O nome da categoria é obrigatório.");
+    }
+}
     //Salvar
     public Categoria salvar(Categoria categoria) {
+        validarCategoria(categoria);
         return categoriaRepositorio.save(categoria);
     }
     //Listar
@@ -32,6 +41,7 @@ public class CategoriaServico {
     //Atualizar
     public Categoria atualizar(Long id, Categoria categoria){
         Categoria categoriaExistente = categoriaRepositorio.findById(id).orElseThrow(() -> new CategoriaNaoEncontradaException(id));
+        validarCategoria(categoria);
         categoriaExistente.setNome(categoria.getNome());
         return categoriaRepositorio.save(categoriaExistente);
     }
