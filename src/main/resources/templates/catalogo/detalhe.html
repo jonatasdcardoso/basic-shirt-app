@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${produto.nome})}">
+    <title>Produto</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <p class="voltar"><a th:href="@{/catalogo}">&larr; Voltar ao catálogo</a></p>
+
+  
+    <article class="detalhe" th:object="${produto}">
+
+        <div class="detalhe-foto">
+            <img th:src="@{/img/camiseta.svg}"
+                 th:alt="|Foto ilustrativa da camiseta *{nome}|"
+                 alt="Foto ilustrativa da camiseta">
+        </div>
+
+        <div class="detalhe-info">
+            <p class="cartao-categoria"
+               th:text="*{categoria?.nome} ?: 'Sem categoria'">Categoria</p>
+
+            <h1 th:text="*{nome}">Nome do produto</h1>
+
+            <p class="preco preco-grande"
+               th:text="'R$ ' + *{#numbers.formatDecimal(preco, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+
+            <p class="estoque"
+               th:text="*{estoque > 0} ? *{estoque} + ' unidade(s) em estoque' : 'Esgotado'"
+               th:classappend="*{estoque > 0} ? '' : 'esgotado'">Em estoque</p>
+
+            <h2 class="subtitulo">Descrição</h2>
+            <p class="descricao" th:text="*{descricao} ?: 'Produto sem descrição.'">Descrição</p>
+        </div>
+
+    </article>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>
