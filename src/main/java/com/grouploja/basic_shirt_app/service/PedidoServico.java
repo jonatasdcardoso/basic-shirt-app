@@ -1,4 +1,3 @@
-
 package com.grouploja.basic_shirt_app.service;
 
 import java.math.BigDecimal;
@@ -32,6 +31,7 @@ public class PedidoServico {
             CarrinhoRepositorio carrinhoRepositorio,
             ProdutoRepositorio produtoRepositorio,
             UsuarioRepositorio usuarioRepositorio) {
+
         this.pedidoRepositorio = pedidoRepositorio;
         this.carrinhoRepositorio = carrinhoRepositorio;
         this.produtoRepositorio = produtoRepositorio;
@@ -68,13 +68,23 @@ public class PedidoServico {
         // Conferir estoque e registrar os itens do pedido
         for (ItemCarrinho item : carrinho.getItens()) {
 
-            Produto produto = produtoRepositorio.findById(
+            // Buscar produto com bloqueio pessimista
+            Produto produto = produtoRepositorio.buscarPorIdComBloqueio(
                 item.getProduto().getId())
                 .orElseThrow(() -> new ProdutoNaoEncontradoException(
                     item.getProduto().getId()));
 
+            // Verificar se o produto continua ativo
+            if (!produto.isAtivo()) {
+                throw new IllegalArgumentException(
+                    "O produto " + produto.getNome()
+                    + " não está mais disponível para compra.");
+            }
+
+            // Verificar estoque
             if (produto.getEstoque() == null ||
                 produto.getEstoque() < item.getQuantidade()) {
+
                 throw new IllegalArgumentException(
                     "Estoque insuficiente para o produto: "
                     + produto.getNome());

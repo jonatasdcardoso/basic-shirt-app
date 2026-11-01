@@ -9,13 +9,13 @@ import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
 
-@Entity 
+@Entity
 public class Produto {
-     
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
     private Long id;
+
     private String nome;
     private String descricao;
     private Integer estoque;
@@ -23,54 +23,76 @@ public class Produto {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
 
-    @ManyToOne (optional = false)// relacionamento de N para 1.
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    @ManyToOne(optional = false)
     private Categoria categoria;
 
     public Produto() {
     }
 
-    public Produto(String nome,String descricao, BigDecimal preco, Integer estoque, Categoria categoria){
+    public Produto(String nome, String descricao, BigDecimal preco,
+                   Integer estoque, Categoria categoria) {
         this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
         this.estoque = estoque;
         this.categoria = categoria;
+        this.ativo = true;
     }
 
     public Long getId() {
         return id;
     }
-    public String getNome(){
+
+    public String getNome() {
         return nome;
     }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
-    public String getDescricao(){
+
+    public String getDescricao() {
         return descricao;
     }
-    public void setDescricao(String descricao){
+
+    public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
     public BigDecimal getPreco() {
         return preco;
     }
-    public void setPreco(BigDecimal preco){
+
+    public void setPreco(BigDecimal preco) {
         this.preco = preco;
     }
-    public Integer getEstoque(){
+
+    public Integer getEstoque() {
         return estoque;
     }
-    public void setEstoque(Integer estoque){
+
+    public void setEstoque(Integer estoque) {
         this.estoque = estoque;
     }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
-    public void setCategoria(Categoria categoria){
+
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
-
 }
 
 
