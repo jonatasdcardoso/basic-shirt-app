@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,23 +25,23 @@ public class CatalogoController {
         this.categoriaServico = categoriaServico;
     }
 
-    
+    // Pagina inicial manda direto pro catalogo
     @GetMapping("/")
     public String inicio() {
         return "redirect:/catalogo";
     }
 
-    
+
     @GetMapping("/catalogo")
     public ModelAndView listar(@RequestParam(required = false) Long categoriaId) {
 
-        List<Produto> produtos = produtoServico.listarTodos();
+        List<Produto> todos = produtoServico.listarTodos();
+        List<Produto> produtos = new ArrayList<>();
 
-        if (categoriaId != null) {
-            produtos = produtos.stream()
-                    .filter(p -> p.getCategoria() != null
-                            && categoriaId.equals(p.getCategoria().getId()))
-                    .toList();
+        for (Produto p : todos) {
+            if (categoriaId == null || p.getCategoria().getId().equals(categoriaId)) {
+                produtos.add(p);
+            }
         }
 
         return new ModelAndView("catalogo/lista")
@@ -55,7 +56,7 @@ public class CatalogoController {
 
         Optional<Produto> produto = produtoServico.buscarPorId(id);
 
-        
+       
         if (produto.isEmpty()) {
             return new ModelAndView("redirect:/catalogo");
         }
