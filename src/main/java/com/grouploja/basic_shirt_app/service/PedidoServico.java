@@ -1,4 +1,3 @@
-
 package com.grouploja.basic_shirt_app.service;
 
 import java.math.BigDecimal;
@@ -113,18 +112,25 @@ public class PedidoServico {
     // Listar pedidos de um usuário
     @Transactional(readOnly = true)
     public List<Pedido> listarPedidos(Long usuarioId) {
+        List<Pedido> pedidos = pedidoRepositorio.findByUsuarioIdOrderByDataPedidoDesc(usuarioId);
+        pedidos.forEach(p -> p.getItens().size());
+        return pedidos;
+    }
 
-        return pedidoRepositorio
-            .findByUsuarioIdOrderByDataPedidoDesc(usuarioId);
+    // Listar todos os pedidos do sistema (Painel Administrativo)
+    @Transactional(readOnly = true)
+    public List<Pedido> listarTodos() {
+        List<Pedido> pedidos = pedidoRepositorio.findAllByOrderByDataPedidoDesc();
+        pedidos.forEach(p -> p.getItens().size());
+        return pedidos;
     }
 
     // Buscar pedido específico de um usuário
     @Transactional(readOnly = true)
     public Pedido buscarPorId(Long pedidoId, Long usuarioId) {
-
-        return pedidoRepositorio.findByIdAndUsuarioId(
-            pedidoId, usuarioId)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Pedido não encontrado."));
+        Pedido pedido = pedidoRepositorio.findByIdAndUsuarioId(pedidoId, usuarioId)
+            .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado."));
+        pedido.getItens().size();
+        return pedido;
     }
 }
