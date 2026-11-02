@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pedido #' + ${pedido.id})}">
+    <title>Detalhe do Pedido</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="voltar"><a th:href="@{/pedidos}">&larr; Voltar para Meus Pedidos</a></p>
+
+    <div class="cabecalho-secao" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 class="titulo-serif" th:text="'Pedido #BS-' + ${pedido.id}">Pedido #BS-1</h1>
+            <p class="subtitulo-suave" style="margin-bottom: 0;">
+                Realizado em <span th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">01/11/2026</span>
+                <span th:if="${enderecoConfirmado != null}" th:text="| · Entrega: ${enderecoConfirmado}|"></span>
+            </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <span class="badge-status badge-confirmado">Pedido Confirmado</span>
+            <span class="badge-status badge-pagamento" th:text="${pedido.formaPagamento.descricao}">PIX</span>
+        </div>
+    </div>
+
+    <div class="caixa-tabela">
+        <div class="cabecalho-caixa-tabela">
+            <h2>Itens Comprados</h2>
+            <strong class="preco-destaque-azul"
+                    th:text="'Total: R$ ' + ${#numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}">Total: R$ 0,00</strong>
+        </div>
+
+        <table class="tabela-dados">
+            <thead>
+                <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Preço Unitário</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${pedido.itens}">
+                    <td>
+                        <strong th:text="${item.nomeProduto}">Camiseta</strong>
+                    </td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td th:text="${item.quantidade}">1</td>
+                    <td>
+                        <strong th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a class="botao-primario" th:href="@{/catalogo}">Continuar Comprando</a>
+        <a class="botao-secundario" th:href="@{/pedidos}">Ver Todos os Pedidos</a>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

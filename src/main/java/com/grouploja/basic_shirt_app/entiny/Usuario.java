@@ -21,6 +21,10 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PerfilUsuario perfil = PerfilUsuario.CLIENTE;
+
     // Um usuário possui apenas um carrinho ativo
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL,
               orphanRemoval = true)
@@ -34,9 +38,14 @@ public class Usuario {
     }
 
     public Usuario(String nome, String email, String senha) {
+        this(nome, email, senha, PerfilUsuario.CLIENTE);
+    }
+
+    public Usuario(String nome, String email, String senha, PerfilUsuario perfil) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+        this.perfil = perfil != null ? perfil : PerfilUsuario.CLIENTE;
     }
 
     public Long getId() {
@@ -65,6 +74,14 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public PerfilUsuario getPerfil() {
+        return perfil != null ? perfil : PerfilUsuario.CLIENTE;
+    }
+
+    public void setPerfil(PerfilUsuario perfil) {
+        this.perfil = perfil != null ? perfil : PerfilUsuario.CLIENTE;
     }
 
     public Carrinho getCarrinho() {
