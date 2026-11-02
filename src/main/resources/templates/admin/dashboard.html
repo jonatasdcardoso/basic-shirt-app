@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Painel Administrativo')}">
+    <title>Painel Administrativo</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="cabecalho-secao">
+        <h1 class="titulo-serif">Dashboard Administrativo</h1>
+        <p class="subtitulo-suave">Visão geral de vendas, clientes e gerenciamento de catálogo (acesso restrito ao perfil Administrador).</p>
+    </div>
+
+    <!-- KPIs inspirados no Mockup 3 -->
+    <section class="grade-kpis" aria-label="Indicadores principais">
+        <article class="cartao-kpi">
+            <p class="rotulo-kpi">Receita Total</p>
+            <p class="valor-kpi"
+               th:text="'R$ ' + ${#numbers.formatDecimal(receitaTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+            <span class="selo-kpi">Vendas confirmadas</span>
+        </article>
+
+        <article class="cartao-kpi">
+            <p class="rotulo-kpi">Pedidos</p>
+            <p class="valor-kpi" th:text="${totalPedidos}">0</p>
+            <span class="selo-kpi">Total registrado</span>
+        </article>
+
+        <article class="cartao-kpi">
+            <p class="rotulo-kpi">Clientes &amp; Usuários</p>
+            <p class="valor-kpi" th:text="${totalClientes}">0</p>
+            <span class="selo-kpi">Contas ativas</span>
+        </article>
+
+        <article class="cartao-kpi">
+            <p class="rotulo-kpi">Ticket Médio</p>
+            <p class="valor-kpi"
+               th:text="'R$ ' + ${#numbers.formatDecimal(ticketMedio, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+            <span class="selo-kpi">Média por pedido</span>
+        </article>
+    </section>
+
+    <!-- Tabela de Pedidos Recentes -->
+    <section class="caixa-tabela" aria-labelledby="titulo-pedidos-recentes">
+        <div class="cabecalho-caixa-tabela">
+            <h2 id="titulo-pedidos-recentes">Pedidos Recentes</h2>
+        </div>
+
+        <p class="aviso" style="margin: 16px;" th:if="${#lists.isEmpty(pedidosRecentes)}">
+            Nenhum pedido foi realizado até o momento.
+        </p>
+
+        <table class="tabela-dados" th:unless="${#lists.isEmpty(pedidosRecentes)}">
+            <thead>
+                <tr>
+                    <th scope="col">Pedido</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Pagamento</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ped : ${pedidosRecentes}">
+                    <td><strong th:text="'#BS-' + ${ped.id}">#BS-1</strong></td>
+                    <td th:text="${ped.usuario.nome}">Nome do Cliente</td>
+                    <td th:text="${#temporals.format(ped.dataPedido, 'dd/MM/yyyy HH:mm')}">01/11/2026</td>
+                    <td th:text="${ped.formaPagamento.descricao}">PIX</td>
+                    <td>
+                        <strong th:text="'R$ ' + ${#numbers.formatDecimal(ped.valorTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>
+                    </td>
+                    <td><span class="badge-status badge-confirmado">Confirmado</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!--Formularios rapidos de CRUD de Categorias e Produtos -->
+    <div class="grade-admin-crud">
+        <section class="cartao-branco" aria-labelledby="titulo-nova-categoria">
+            <h2 id="titulo-nova-categoria" class="titulo-serif" style="font-size: 20px;">Categorias</h2>
+            <p class="subtitulo-suave">Cadastre novas categorias para o catálogo.</p>
+
+            <form th:action="@{/admin/categorias}" method="post" style="display: flex; gap: 10px; margin-bottom: 18px;">
+                <label for="nomeCategoria" class="pular-conteudo">Nome da categoria</label>
+                <input id="nomeCategoria"
+                       name="nome"
+                       type="text"
+                       placeholder="Ex.: Manga Longa"
+                       style="flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;"
+                       required>
+                <button type="submit" class="botao-primario">Adicionar</button>
+            </form>
+
+            <ul class="lista-mini-itens">
+                <li th:each="cat : ${categorias}">
+                    <span th:text="${cat.nome}">Categoria</span>
+                    <form th:action="@{/admin/categorias/{id}/excluir(id=${cat.id})}" method="post" style="margin: 0;">
+                        <button type="submit" class="botao-perigo-link">Excluir</button>
+                    </form>
+                </li>
+            </ul>
+        </section>
+
+        <section class="cartao-branco" aria-labelledby="titulo-novo-produto">
+            <h2 id="titulo-novo-produto" class="titulo-serif" style="font-size: 20px;">Novo Produto</h2>
+            <p class="subtitulo-suave">Adicione produtos diretamente ao catálogo da loja.</p>
+
+            <form th:action="@{/admin/produtos}" method="post">
+                <div class="grupo-campo">
+                    <label for="nomeProd">Nome do produto</label>
+                    <input id="nomeProd" name="nome" type="text" placeholder="Ex.: Camiseta Gola V Preta" required>
+                </div>
+
+                <div class="grade-campos-dupla">
+                    <div class="grupo-campo">
+                        <label for="precoProd">Preço (R$)</label>
+                        <input id="precoProd" name="preco" type="number" step="0.01" min="0" placeholder="99.90" required>
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="estoqueProd">Estoque inicial</label>
+                        <input id="estoqueProd" name="estoque" type="number" min="0" placeholder="15" required>
+                    </div>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="categoriaProd">Categoria</label>
+                    <select id="categoriaProd" name="categoriaId" required>
+                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}">Categoria</option>
+                    </select>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="descricaoProd">Descrição</label>
+                    <textarea id="descricaoProd" name="descricao" rows="2" placeholder="Detalhes de tecido e modelagem"></textarea>
+                </div>
+
+                <button type="submit" class="botao-primario botao-largo">Cadastrar Produto</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Gerenciamento de Estoque dos Produtos -->
+    <section class="caixa-tabela" aria-labelledby="titulo-estoque-produtos">
+        <div class="cabecalho-caixa-tabela">
+            <h2 id="titulo-estoque-produtos">Produtos Cadastrados</h2>
+        </div>
+
+        <table class="tabela-dados" th:unless="${#lists.isEmpty(produtos)}">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Preço</th>
+                    <th scope="col">Estoque</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="prod : ${produtos}">
+                    <td th:text="${prod.id}">1</td>
+                    <td>
+                        <a th:href="@{/catalogo/{id}(id=${prod.id})}" th:text="${prod.nome}">Produto</a>
+                    </td>
+                    <td th:text="${prod.categoria?.nome} ?: '-'">Categoria</td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(prod.preco, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td>
+                        <form class="form-estoque-inline" th:action="@{/admin/produtos/{id}/estoque(id=${prod.id})}" method="post">
+                            <input type="number" name="estoque" min="0" th:value="${prod.estoque}"
+                                   th:aria-label="|Estoque de ${prod.nome}|" required>
+                            <button type="submit" class="botao-secundario" style="padding: 6px 10px; font-size: 12px;">Salvar</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/produtos/{id}/excluir(id=${prod.id})}" method="post" style="margin: 0;">
+                            <button type="submit" class="botao-perigo-link">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

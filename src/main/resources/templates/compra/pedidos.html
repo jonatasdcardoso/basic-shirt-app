@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Meus Pedidos')}">
+    <title>Meus Pedidos</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="cabecalho-secao">
+        <h1 class="titulo-serif">Meus Pedidos</h1>
+        <p class="subtitulo-suave">Histórico completo das compras realizadas na sua conta.</p>
+    </div>
+
+    <section class="estado-vazio" th:if="${#lists.isEmpty(pedidos)}">
+        <h2>Você ainda não realizou pedidos</h2>
+        <p>Assim que finalizar sua primeira compra, ela aparecerá registrada aqui.</p>
+        <a class="botao-primario" th:href="@{/catalogo}">Ir ao Catálogo</a>
+    </section>
+
+    <div class="lista-pedidos" th:unless="${#lists.isEmpty(pedidos)}">
+        <article class="cartao-pedido" th:each="ped : ${pedidos}">
+            <div>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;">
+                    Pedido <strong th:text="'#BS-' + ${ped.id}">#BS-1</strong>
+                    &middot;
+                    <span th:text="${#temporals.format(ped.dataPedido, 'dd/MM/yyyy HH:mm')}">01/11/2026 20:00</span>
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <span class="badge-status badge-confirmado">Confirmado</span>
+                    <span class="badge-status badge-pagamento" th:text="${ped.formaPagamento.descricao}">PIX</span>
+                    <span style="font-size: 13px; color: #555555;"
+                          th:text="|${#lists.size(ped.itens)} ${#lists.size(ped.itens) == 1 ? 'produto' : 'produtos'}|">1 produto</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <p class="preco-destaque-azul"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(ped.valorTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+                <a class="botao-secundario" th:href="@{/pedidos/{id}(id=${ped.id})}">Ver Detalhes</a>
+            </div>
+        </article>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

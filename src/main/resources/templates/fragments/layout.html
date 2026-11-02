@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <!-- Arquivo so de fragmentos: pedacos de HTML reaproveitados em todas as paginas
      usando th:replace="~{fragments/layout :: nome}" -->
 
@@ -8,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${titulo} + ' | Basic Shirt'">Basic Shirt</title>
     <link th:href="@{/css/estilo.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/compra.css}" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -16,19 +19,56 @@
     <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
     <!-- Faixa preta fininha no topo, estilo loja de insider -->
-    <p class="faixa-topo">Camisetas básicas 100% algodão</p>
+    <p class="faixa-topo">Camisetas básicas 100% algodão · Frete grátis para todo o Brasil</p>
 
     <div class="cabecalho-interno">
         <a class="logo" th:href="@{/catalogo}">BASIC SHIRT</a>
         <nav aria-label="Menu principal">
             <ul class="menu">
                 <li><a th:href="@{/catalogo}">Catálogo</a></li>
-                <li><a th:href="@{/carrinho}">Carrinho</a></li>
-                <li><a th:href="@{/login}">Entrar</a></li>
+                <li>
+                    <a class="link-carrinho-menu" th:href="@{/carrinho}">
+                        <span>Carrinho</span>
+                        <span class="badge-carrinho"
+                              th:if="${quantidadeItensCarrinho != null and quantidadeItensCarrinho > 0}"
+                              th:text="${quantidadeItensCarrinho}"
+                              th:aria-label="|${quantidadeItensCarrinho} itens no carrinho|">1</span>
+                    </a>
+                </li>
+
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/pedidos}">Meus Pedidos</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/minha-conta}"
+                       th:text="${nomeUsuarioLogado != null} ? 'Olá, ' + ${nomeUsuarioLogado} : 'Minha Conta'">Minha Conta</a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a class="tag-admin-menu" th:href="@{/admin}">Admin</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <form class="form-logout-menu" th:action="@{/logout}" method="post">
+                        <button type="submit" class="link-menu-botao">Sair</button>
+                    </form>
+                </li>
+
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}">Entrar</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/cadastro}">Criar Conta</a>
+                </li>
             </ul>
         </nav>
     </div>
 </header>
+
+<div th:fragment="alertas">
+    <div class="alerta alerta-sucesso" role="status" aria-live="polite"
+         th:if="${mensagemSucesso != null}" th:text="${mensagemSucesso}"></div>
+    <div class="alerta alerta-erro" role="alert"
+         th:if="${mensagemErro != null}" th:text="${mensagemErro}"></div>
+</div>
 
 <footer th:fragment="rodape" class="rodape">
     <p class="logo-rodape">BASIC SHIRT</p>

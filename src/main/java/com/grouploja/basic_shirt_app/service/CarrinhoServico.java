@@ -1,11 +1,13 @@
-
 package com.grouploja.basic_shirt_app.service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.grouploja.basic_shirt_app.dto.ItemCarrinhoViewDTO;
 import com.grouploja.basic_shirt_app.entiny.Carrinho;
 import com.grouploja.basic_shirt_app.entiny.ItemCarrinho;
 import com.grouploja.basic_shirt_app.entiny.Produto;
@@ -44,6 +46,16 @@ public class CarrinhoServico {
                 usuario.setCarrinho(carrinho);
                 return carrinhoRepositorio.save(carrinho);
             });
+    }
+
+    // Listar itens detalhados do carrinho para exibicao nas views
+    @Transactional
+    public List<ItemCarrinhoViewDTO> listarItensParaExibicao(Long usuarioId) {
+        Carrinho carrinho = buscarOuCriar(usuarioId);
+        return carrinho.getItens().stream()
+            .sorted(Comparator.comparing(ItemCarrinho::getId))
+            .map(ItemCarrinhoViewDTO::de)
+            .toList();
     }
 
     // Adicionar produto ao carrinho
@@ -147,5 +159,14 @@ public class CarrinhoServico {
                 .multiply(BigDecimal.valueOf(item.getQuantidade())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-}
 
+    // Contar total de unidades no carrinho sem criar novo registro
+    @Transactional(readOnly = true)
+    public int contarUnidadesPorUsuarioId(Long usuarioId) {
+        return carrinhoRepositorio.findByUsuarioId(usuarioId)
+            .map(carrinho -> carrinho.getItens().stream()
+                .mapToInt(ItemCarrinho::getQuantidade)
+                .sum())
+            .orElse(0);
+    }
+}

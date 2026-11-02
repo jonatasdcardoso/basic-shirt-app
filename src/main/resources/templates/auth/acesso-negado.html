@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Acesso Negado')}">
+    <title>Acesso Negado</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+    <section class="estado-vazio" aria-labelledby="titulo-acesso-negado">
+        <h1 id="titulo-acesso-negado" class="titulo-serif">Acesso Restrito (403)</h1>
+        <p>Sua conta não possui permissão de administrador para acessar esta funcionalidade.</p>
+        <a class="botao-primario" th:href="@{/catalogo}">Voltar ao Catálogo</a>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>
