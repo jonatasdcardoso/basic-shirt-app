@@ -1,0 +1,296 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+    font-size: 16px;
+    color: #111111;
+    background-color: #ffffff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+a {
+    color: #111111;
+}
+
+/* Contorno visivel quando navega pelo teclado (Tab) */
+a:focus,
+button:focus {
+    outline: 2px solid #111111;
+    outline-offset: 3px;
+}
+
+/*  Cabecalho  */
+.faixa-topo {
+    margin: 0;
+    padding: 8px;
+    background-color: #111111;
+    color: #ffffff;
+    font-size: 12px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.cabecalho {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.cabecalho-interno {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 20px;
+    display: flex;                   
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    text-decoration: none;
+}
+
+.menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 24px;
+}
+
+.menu a {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    text-decoration: underline;
+}
+
+/* Link "Pular para o conteudo": escondido ate receber foco pelo teclado */
+.pular-conteudo {
+    position: absolute;
+    left: -9999px;
+}
+
+.pular-conteudo:focus {
+    position: static;
+    display: block;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+/*  Titulo e filtro  */
+.titulo-pagina {
+    font-size: 28px;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 8px 0 20px 0;
+}
+
+.filtro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+/* cada categoria vira um "botaozinho" com borda */
+.filtro a {
+    padding: 8px 16px;
+    border: 1px solid #111111;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.filtro a:hover,
+.filtro a.ativo {
+    background-color: #111111;
+    color: #ffffff;
+}
+
+.aviso {
+    padding: 20px;
+    border: 1px solid #e5e5e5;
+    text-align: center;
+}
+
+
+.grade-produtos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 32px 20px;
+}
+
+.cartao-link {
+    text-decoration: none;
+}
+
+.cartao-foto {
+    position: relative;              /* para o selo "Esgotado" ficar em cima da foto */
+    background-color: #f2f2f2;
+}
+
+.cartao-foto img {
+    display: block;
+    width: 100%;
+}
+
+.cartao-link:hover img {
+    opacity: 0.85;
+}
+
+.selo-esgotado {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    background-color: #111111;
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cartao-titulo {
+    font-size: 14px;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 12px 0 4px 0;
+}
+
+.cartao-link:hover .cartao-titulo {
+    text-decoration: underline;
+}
+
+.cartao-categoria {
+    color: #555555;
+    font-size: 13px;
+    margin: 0 0 4px 0;
+}
+
+.preco {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+/*  Detalhe do produto  */
+.voltar a {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.detalhe {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;                  /* no celular a foto vai pra cima do texto */
+    margin-top: 16px;
+}
+
+.detalhe-foto {
+    flex: 1;
+    min-width: 280px;
+    background-color: #f2f2f2;
+}
+
+.detalhe-foto img {
+    display: block;
+    width: 100%;
+}
+
+.detalhe-info {
+    flex: 1;
+    min-width: 280px;
+}
+
+.detalhe-info h1 {
+    font-size: 26px;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 4px 0 12px 0;
+}
+
+.preco-grande {
+    font-size: 22px;
+}
+
+.estoque {
+    font-size: 14px;
+    color: #555555;
+}
+
+.esgotado {
+    color: #b91c1c;
+    font-weight: bold;
+}
+
+.subtitulo {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 20px;
+    margin-top: 28px;
+}
+
+.descricao {
+    line-height: 1.6;
+    color: #333333;
+}
+
+/*  Rodape  */
+.rodape {
+    background-color: #111111;
+    color: #ffffff;
+    text-align: center;
+    padding: 32px 15px;
+    margin-top: 60px;
+    font-size: 13px;
+}
+
+.logo-rodape {
+    font-weight: bold;
+    letter-spacing: 4px;
+    font-size: 16px;
+}
+
+/*  Celular  */
+/* Telas pequenas: 2 produtos por linha e logo centralizado */
+@media (max-width: 600px) {
+    .grade-produtos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px 12px;
+    }
+
+    .cabecalho-interno {
+        justify-content: center;
+    }
+
+    .titulo-pagina {
+        font-size: 22px;
+    }
+}

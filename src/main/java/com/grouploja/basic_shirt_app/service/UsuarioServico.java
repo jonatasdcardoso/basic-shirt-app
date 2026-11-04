@@ -1,134 +1,244 @@
-
 package com.grouploja.basic_shirt_app.service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.grouploja.basic_shirt_app.entiny.PerfilUsuario;
 import com.grouploja.basic_shirt_app.entiny.Usuario;
-import com.grouploja.basic_shirt_app.repository.UsuarioRepositorio;
 import com.grouploja.basic_shirt_app.repository.PedidoRepositorio;
+import com.grouploja.basic_shirt_app.repository.UsuarioRepositorio;
 
 @Service
+@Transactional
 public class UsuarioServico {
 
     private final UsuarioRepositorio usuarioRepositorio;
     private final PedidoRepositorio pedidoRepositorio;
+    private final PasswordEncoder passwordEncoder;
 
     public UsuarioServico(
             UsuarioRepositorio usuarioRepositorio,
-            PedidoRepositorio pedidoRepositorio) {
+            PedidoRepositorio pedidoRepositorio,
+            PasswordEncoder passwordEncoder) {
+
         this.usuarioRepositorio = usuarioRepositorio;
         this.pedidoRepositorio = pedidoRepositorio;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // Normalizar dados do usuário
     private void normalizarUsuario(Usuario usuario) {
-        if (usuario == null) {
-            throw new IllegalArgumentException(
-                "Os dados do usuário são obrigatórios.");
-        }
-
-        if (usuario.getNome() != null) {
-            usuario.setNome(usuario.getNome().trim());
-        }
-
-        if (usuario.getEmail() != null) {
-            usuario.setEmail(
-                usuario.getEmail().trim().toLowerCase(Locale.ROOT));
-        }
+        usuario.setNome(usuario.getNome().trim());
+        usuario.setEmail(usuario.getEmail().trim().toLowerCase(Locale.ROOT));
     }
 
-    // Validar usuário
     private void validarUsuario(Usuario usuario) {
-        if (usuario == null)
-            throw new IllegalArgumentException(
-                "Os dados do usuário são obrigatórios.");
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não informado.");
+        }
 
-        if (usuario.getNome() == null || usuario.getNome().isBlank())
-            throw new IllegalArgumentException(
-                "O nome do usuário é obrigatório.");
+        if (usuario.getNome() == null || usuario.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome é obrigatório.");
+        }
 
-        if (usuario.getEmail() == null || usuario.getEmail().isBlank())
-            throw new IllegalArgumentException(
-                "O e-mail do usuário é obrigatório.");
+        if (usuario.getEmail() == null
+                || !usuario.getEmail().trim()
+                        .matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("Informe um e-mail válido.");
+        }
 
-        if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"))
-            throw new IllegalArgumentException(
-                "O e-mail informado é inválido.");
+        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+            throw new IllegalArgumentException("A senha é obrigatória.");
+        }
 
-        if (usuario.getSenha() == null || usuario.getSenha().isBlank())
+        if (usuario.getSenha().length() < 6) {
             throw new IllegalArgumentException(
-                "A senha do usuário é obrigatória.");
+                    "A senha deve possuir pelo menos 6 caracteres.");
+        }
     }
 
-    // Cadastrar usuário
-    @Transactional
-    public Usuario salvar(Usuario usuario) {
-        normalizarUsuario(usuario);
-        validarUsuario(usuario);
+    // Cadastra um novo cliente com confirmação de senha.
+    public Usuario cadastrarCliente(
+            String nome,
+            String email,
+            String senha,
+            String confirmarSenha) {
 
-        if (usuarioRepositorio.existsByEmailIgnoreCase(usuario.getEmail()))
+        if (senha == null || senha.length() < 6) {
             throw new IllegalArgumentException(
-                "Já existe um usuário cadastrado com esse e-mail.");
+                    "A senha deve possuir pelo menos 6 caracteres.");
+        }
+
+        if (!senha.equals(confirmarSenha)) {
+            throw new IllegalArgumentException("As senhas não coincidem.");
+        }
+
+        Usuario novoUsuario = new Usuario(
+                nome,
+                email,
+                senha,
+                PerfilUsuario.CLIENTE);
+
+        return salvar(novoUsuario);
+    }
+
+    // Salva um usuário com senha criptografada.
+    public Usuario salvar(Usuario usuario) {
+        validarUsuario(usuario);
+        normalizarUsuario(usuario);
+
+        if (usuarioRepositorio.existsByEmailIgnoreCase(usuario.getEmail())) {
+            throw new IllegalArgumentException(
+                    "Já existe um usuário cadastrado com este e-mail.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+
+        if (usuario.getPerfil() == null) {
+            usuario.setPerfil(PerfilUsuario.CLIENTE);
+        }
 
         return usuarioRepositorio.save(usuario);
     }
 
-    // Listar usuários
     @Transactional(readOnly = true)
     public List<Usuario> listarTodos() {
         return usuarioRepositorio.findAll();
     }
 
-    // Buscar usuário por ID
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long id) {
         return usuarioRepositorio.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Usuário não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Usuário não encontrado."));
     }
 
-    // Atualizar usuário
-    @Transactional
-    public Usuario atualizar(Long id, Usuario usuario) {
-        Usuario usuarioExistente = buscarPorId(id);
+    @Transactional(readOnly = true)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepositorio.findByEmailIgnoreCase(email.trim())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Usuário não encontrado."));
+    }
 
-        normalizarUsuario(usuario);
-        validarUsuario(usuario);
-
-        boolean emailDuplicado =
-            usuarioRepositorio.existsByEmailIgnoreCase(usuario.getEmail());
-
-        if (emailDuplicado &&
-            !usuarioExistente.getEmail().trim()
-                .equalsIgnoreCase(usuario.getEmail())) {
-            throw new IllegalArgumentException(
-                "Já existe um usuário cadastrado com esse e-mail.");
+    @Transactional(readOnly = true)
+    public Optional<Usuario> buscarPorEmailOpcional(String email) {
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
         }
 
-        usuarioExistente.setNome(usuario.getNome());
-        usuarioExistente.setEmail(usuario.getEmail());
-        usuarioExistente.setSenha(usuario.getSenha());
+        return usuarioRepositorio.findByEmailIgnoreCase(email.trim());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existePorEmail(String email) {
+        return email != null
+                && usuarioRepositorio.existsByEmailIgnoreCase(email.trim());
+    }
+
+    // Atualiza os dados cadastrais de um usuário.
+    public Usuario atualizar(Long id, Usuario dadosAtualizados) {
+        Usuario usuarioExistente = buscarPorId(id);
+
+        if (dadosAtualizados == null) {
+            throw new IllegalArgumentException(
+                    "Os dados do usuário não foram informados.");
+        }
+
+        if (dadosAtualizados.getNome() == null
+                || dadosAtualizados.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome é obrigatório.");
+        }
+
+        if (dadosAtualizados.getEmail() == null
+                || !dadosAtualizados.getEmail().trim()
+                        .matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("Informe um e-mail válido.");
+        }
+
+        String novoEmail = dadosAtualizados.getEmail()
+                .trim().toLowerCase(Locale.ROOT);
+
+        boolean emailEmUso = usuarioRepositorio
+                .findByEmailIgnoreCase(novoEmail)
+                .filter(usuario -> !usuario.getId().equals(id))
+                .isPresent();
+
+        if (emailEmUso) {
+            throw new IllegalArgumentException(
+                    "Já existe um usuário cadastrado com este e-mail.");
+        }
+
+        usuarioExistente.setNome(dadosAtualizados.getNome().trim());
+        usuarioExistente.setEmail(novoEmail);
+
+        if (dadosAtualizados.getSenha() != null
+                && !dadosAtualizados.getSenha().isBlank()) {
+
+            if (dadosAtualizados.getSenha().length() < 6) {
+                throw new IllegalArgumentException(
+                        "A senha deve possuir pelo menos 6 caracteres.");
+            }
+
+            usuarioExistente.setSenha(
+                    passwordEncoder.encode(dadosAtualizados.getSenha()));
+        }
 
         return usuarioRepositorio.save(usuarioExistente);
     }
 
-    // Excluir usuário
-    @Transactional
+    // Atualiza o perfil e permite trocar a senha mediante confirmação.
+    public Usuario atualizarPerfil(
+            Long usuarioId,
+            String nome,
+            String senhaAtual,
+            String novaSenha,
+            String confirmarNovaSenha) {
+
+        Usuario usuario = buscarPorId(usuarioId);
+
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome é obrigatório.");
+        }
+
+        usuario.setNome(nome.trim());
+
+        if (novaSenha != null && !novaSenha.isBlank()) {
+
+            if (senhaAtual == null || senhaAtual.isBlank()
+                    || !passwordEncoder.matches(
+                            senhaAtual, usuario.getSenha())) {
+                throw new IllegalArgumentException("Senha atual incorreta.");
+            }
+
+            if (novaSenha.length() < 6) {
+                throw new IllegalArgumentException(
+                        "A nova senha deve possuir pelo menos 6 caracteres.");
+            }
+
+            if (!novaSenha.equals(confirmarNovaSenha)) {
+                throw new IllegalArgumentException(
+                        "A confirmação da nova senha não coincide.");
+            }
+
+            usuario.setSenha(passwordEncoder.encode(novaSenha));
+        }
+
+        return usuarioRepositorio.save(usuario);
+    }
+
+    // Exclui o usuário somente se ele não possuir pedidos.
     public void excluir(Long id) {
+        Usuario usuario = buscarPorId(id);
 
-        if (!usuarioRepositorio.existsById(id))
+        if (pedidoRepositorio.existsByUsuarioId(id)) {
             throw new IllegalArgumentException(
-                "Usuário não encontrado.");
+                    "Não é possível excluir um usuário que possui pedidos.");
+        }
 
-        // Impede excluir usuário que possui pedidos registrados
-        if (pedidoRepositorio.existsByUsuarioId(id))
-            throw new IllegalArgumentException(
-                "Não é possível excluir um usuário que possui pedidos registrados.");
-
-        usuarioRepositorio.deleteById(id);
+        usuarioRepositorio.delete(usuario);
     }
 }

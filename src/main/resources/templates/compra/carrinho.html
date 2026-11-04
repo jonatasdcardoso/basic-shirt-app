@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Meu Carrinho')}">
+    <title>Meu Carrinho</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="cabecalho-secao">
+        <h1 class="titulo-serif">Meu Carrinho</h1>
+    </div>
+
+    <section class="estado-vazio" th:if="${#lists.isEmpty(itens)}">
+        <h2>Seu carrinho está vazio</h2>
+        <p>Explore o catálogo de camisetas Basic Shirt e adicione seus modelos favoritos.</p>
+        <a class="botao-primario" th:href="@{/catalogo}">Explorar Catálogo</a>
+    </section>
+
+    <div class="grade-compra" th:unless="${#lists.isEmpty(itens)}">
+
+        <section class="lista-itens-carrinho" aria-label="Produtos no carrinho">
+            <article class="cartao-item-carrinho" th:each="item : ${itens}">
+                <div class="miniatura-item">
+                    <img th:src="@{/img/camiseta.svg}"
+                         th:alt="|Miniatura de ${item.nomeProduto}|"
+                         alt="Miniatura do produto">
+                </div>
+
+                <div class="info-item-carrinho">
+                    <p class="categoria-item" th:text="${item.categoriaNome}">Categoria</p>
+                    <h2 class="nome-item">
+                        <a th:href="@{/catalogo/{id}(id=${item.produtoId})}"
+                           th:text="${item.nomeProduto}">Nome do Produto</a>
+                    </h2>
+                    <p class="meta-item">
+                        <span>Unitário: </span>
+                        <strong th:text="'R$ ' + ${#numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>
+                        <span> &middot; Estoque disponível: </span>
+                        <span th:text="${item.estoqueDisponivel}">10</span>
+                    </p>
+
+                    <div class="controle-quantidade" role="group" th:aria-label="|Alterar quantidade de ${item.nomeProduto}|">
+                        <form th:action="@{/carrinho/itens/{id}/quantidade(id=${item.itemId})}" method="post">
+                            <input type="hidden" name="quantidade" th:value="${item.quantidade - 1}">
+                            <button type="submit"
+                                    class="botao-qtd"
+                                    th:aria-label="|Diminuir quantidade de ${item.nomeProduto}|">&minus;</button>
+                        </form>
+
+                        <span class="valor-qtd" th:text="${item.quantidade}">1</span>
+
+                        <form th:action="@{/carrinho/itens/{id}/quantidade(id=${item.itemId})}" method="post">
+                            <input type="hidden" name="quantidade" th:value="${item.quantidade + 1}">
+                            <button type="submit"
+                                    class="botao-qtd"
+                                    th:disabled="${item.quantidade >= item.estoqueDisponivel}"
+                                    th:aria-label="|Aumentar quantidade de ${item.nomeProduto}|">+</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="acoes-preco-item">
+                    <p class="preco-destaque-azul"
+                       th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+
+                    <form th:action="@{/carrinho/itens/{id}/remover(id=${item.itemId})}" method="post">
+                        <button type="submit"
+                                class="botao-perigo-link"
+                                th:aria-label="|Remover ${item.nomeProduto} do carrinho|">Remover</button>
+                    </form>
+                </div>
+            </article>
+        </section>
+
+        <aside class="cartao-resumo" aria-labelledby="titulo-resumo-carrinho">
+            <h2 id="titulo-resumo-carrinho">Resumo do Pedido</h2>
+
+            <div class="linha-resumo">
+                <span th:text="|Subtotal (${totalUnidades} ${totalUnidades == 1 ? 'item' : 'itens'})|">Subtotal (1 item)</span>
+                <span th:text="'R$ ' + ${#numbers.formatDecimal(subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+            </div>
+
+            <div class="linha-resumo">
+                <span>Frete</span>
+                <strong style="color: #166534;">Grátis</strong>
+            </div>
+
+            <p class="nota-frete">Frete grátis promocional aplicado automaticamente para compras Basic Shirt.</p>
+
+            <hr class="divisor-resumo">
+
+            <div class="linha-total">
+                <span>Total</span>
+                <span class="valor-total-azul"
+                      th:text="'R$ ' + ${#numbers.formatDecimal(subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+            </div>
+
+            <a class="botao-primario botao-largo" th:href="@{/checkout}">Finalizar Compra</a>
+            <a class="link-continuar" th:href="@{/catalogo}">Continuar comprando</a>
+        </aside>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>
