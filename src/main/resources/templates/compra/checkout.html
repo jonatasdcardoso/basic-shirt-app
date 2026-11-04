@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Finalizar Compra')}">
+    <title>Finalizar Compra</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="voltar"><a th:href="@{/carrinho}">&larr; Voltar ao carrinho</a></p>
+
+    <div class="cabecalho-secao">
+        <h1 class="titulo-serif">Finalizar Compra</h1>
+        <p class="subtitulo-suave">Confira os dados de entrega, escolha a forma de pagamento e confirme seu pedido.</p>
+    </div>
+
+    <form th:action="@{/checkout/finalizar}" method="post" class="grade-compra">
+
+        <section class="cartao-branco" aria-labelledby="titulo-pagamento-entrega">
+            <h2 id="titulo-pagamento-entrega" class="titulo-serif" style="font-size: 21px;">1. Identificação e Entrega</h2>
+            <p class="subtitulo-suave">
+                Comprando como <strong th:text="${usuario.nome}">Cliente</strong>
+                (<span th:text="${usuario.email}">email@exemplo.com</span>).
+            </p>
+
+            <div class="grade-campos-dupla">
+                <div class="grupo-campo">
+                    <label for="cep">CEP</label>
+                    <input id="cep" name="cep" type="text" placeholder="00000-000" maxlength="9" required>
+                </div>
+                <div class="grupo-campo">
+                    <label for="cidade">Cidade / UF</label>
+                    <input id="cidade" name="cidade" type="text" placeholder="Ex.: Campo Grande / MS" required>
+                </div>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="endereco">Endereço completo para entrega</label>
+                <input id="endereco" name="endereco" type="text" placeholder="Rua, número, bairro e complemento" required>
+            </div>
+
+            <hr class="divisor-resumo">
+
+            <h2 class="titulo-serif" style="font-size: 21px;">2. Forma de Pagamento</h2>
+            <p class="subtitulo-suave">Selecione uma das modalidades disponíveis:</p>
+
+            <div class="opcoes-pagamento" role="radiogroup" aria-label="Formas de pagamento">
+                <label class="opcao-pagamento-card" th:each="fp, iter : ${formasPagamento}">
+                    <input type="radio"
+                           name="formaPagamento"
+                           th:value="${fp.name()}"
+                           th:checked="${iter.index == 0}"
+                           required>
+                    <span>
+                        <span class="opcao-pagamento-titulo" th:text="${fp.descricao}">PIX</span>
+                        <span class="opcao-pagamento-desc" th:text="${fp.detalhe}">Detalhe</span>
+                    </span>
+                </label>
+            </div>
+        </section>
+
+        <aside class="cartao-resumo" aria-labelledby="titulo-resumo-checkout">
+            <h2 id="titulo-resumo-checkout">Resumo do Pedido</h2>
+
+            <ul class="lista-mini-itens">
+                <li th:each="item : ${itens}">
+                    <span th:text="|${item.quantidade}x ${item.nomeProduto}|">1x Produto</span>
+                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>
+                </li>
+            </ul>
+
+            <div class="linha-resumo">
+                <span th:text="|Itens (${totalUnidades})|">Itens</span>
+                <span th:text="'R$ ' + ${#numbers.formatDecimal(subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+            </div>
+
+            <div class="linha-resumo">
+                <span>Frete</span>
+                <strong style="color: #166534;">Grátis</strong>
+            </div>
+
+            <hr class="divisor-resumo">
+
+            <div class="linha-total">
+                <span>Total a pagar</span>
+                <span class="valor-total-azul"
+                      th:text="'R$ ' + ${#numbers.formatDecimal(subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+            </div>
+
+            <button type="submit" class="botao-primario botao-largo">Confirmar Pedido</button>
+            <a class="link-continuar" th:href="@{/carrinho}">Alterar itens do carrinho</a>
+        </aside>
+
+    </form>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

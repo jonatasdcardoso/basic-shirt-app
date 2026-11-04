@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Minha Conta')}">
+    <title>Minha Conta</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="cabecalho-secao">
+        <h1 class="titulo-serif">Minha Conta</h1>
+        <p class="subtitulo-suave">Gerencie seus dados cadastrais e acompanhe suas compras na Basic Shirt.</p>
+    </div>
+
+    <div class="grade-compra">
+        <section class="cartao-branco" aria-labelledby="titulo-dados-pessoais">
+            <h2 id="titulo-dados-pessoais" class="titulo-serif" style="font-size: 22px;">Dados Cadastrais</h2>
+            <p class="subtitulo-suave">Preencha os campos de senha apenas se desejar alterá-la.</p>
+
+            <form th:action="@{/minha-conta}" method="post">
+                <div class="grupo-campo">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome" name="nome" type="text" th:value="${usuario.nome}" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="email">E-mail (identificador da conta)</label>
+                    <input id="email" type="email" th:value="${usuario.email}" disabled>
+                </div>
+
+                <hr class="divisor-resumo">
+
+                <div class="grupo-campo">
+                    <label for="senhaAtual">Senha atual</label>
+                    <input id="senhaAtual" name="senhaAtual" type="password" placeholder="Necessária apenas para trocar de senha">
+                </div>
+
+                <div class="grade-campos-dupla">
+                    <div class="grupo-campo">
+                        <label for="novaSenha">Nova senha</label>
+                        <input id="novaSenha" name="novaSenha" type="password" minlength="6" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="confirmarNovaSenha">Confirmar nova senha</label>
+                        <input id="confirmarNovaSenha" name="confirmarNovaSenha" type="password" minlength="6" placeholder="Repita a nova senha">
+                    </div>
+                </div>
+
+                <button type="submit" class="botao-primario">Salvar Alterações</button>
+            </form>
+        </section>
+
+        <aside class="cartao-resumo" aria-label="Resumo da conta">
+            <h2>Resumo</h2>
+            <div class="linha-resumo">
+                <span>Perfil de acesso</span>
+                <span class="badge-status badge-pagamento" th:text="${usuario.perfil.descricao}">Cliente</span>
+            </div>
+            <div class="linha-resumo">
+                <span>Pedidos realizados</span>
+                <strong th:text="${totalPedidos}">0</strong>
+            </div>
+            <div class="linha-resumo">
+                <span>Itens no carrinho</span>
+                <strong th:text="${quantidadeItensCarrinho}">0</strong>
+            </div>
+            <hr class="divisor-resumo">
+            <a class="botao-primario botao-largo" th:href="@{/pedidos}">Ver Meus Pedidos</a>
+            <a class="link-continuar" th:href="@{/carrinho}">Ir para Meu Carrinho</a>
+        </aside>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>
