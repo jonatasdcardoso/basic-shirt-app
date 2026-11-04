@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.grouploja.basic_shirt_app.entiny.PerfilUsuario;
 import com.grouploja.basic_shirt_app.entiny.Usuario;
+import com.grouploja.basic_shirt_app.repository.PedidoRepositorio;
 import com.grouploja.basic_shirt_app.repository.UsuarioRepositorio;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,13 +30,20 @@ class UsuarioServicoTest {
     @Mock
     private UsuarioRepositorio usuarioRepositorio;
 
+    @Mock
+    private PedidoRepositorio pedidoRepositorio;
+
     private PasswordEncoder passwordEncoder;
     private UsuarioServico usuarioServico;
 
     @BeforeEach
     void configurar() {
         passwordEncoder = new BCryptPasswordEncoder();
-        usuarioServico = new UsuarioServico(usuarioRepositorio, passwordEncoder);
+        usuarioServico = new UsuarioServico(
+            usuarioRepositorio,
+            pedidoRepositorio,
+            passwordEncoder
+        );
     }
 
     @Test
@@ -64,7 +72,7 @@ class UsuarioServicoTest {
             () -> usuarioServico.cadastrarCliente("João", "joao@teste.com", "123456", "654321")
         );
 
-        assertTrue(erro.getMessage().contains("confirmação"));
+        assertTrue(erro.getMessage().contains("senhas"));
         verify(usuarioRepositorio, never()).save(any());
     }
 
