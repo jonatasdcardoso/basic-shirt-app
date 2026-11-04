@@ -87,7 +87,7 @@ src/main/resources/
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Java 21+** (compatível com JDK 21 a 25)
+- **Java 25+** (Java 25 é a versão LTS de referência)
 - **Spring Boot 4.1.1** (Spring MVC, Spring Data JPA, Spring Security, Bean Validation)
 - **Thymeleaf** + `thymeleaf-extras-springsecurity6` + **HTML5 / CSS3**
 - **PostgreSQL** (produção/desenvolvimento padrão) e **H2 Database** (testes automatizados e perfil rápido `dev`)

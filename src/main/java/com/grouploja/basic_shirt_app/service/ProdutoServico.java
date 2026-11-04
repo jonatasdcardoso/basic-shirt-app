@@ -4,7 +4,10 @@ package com.grouploja.basic_shirt_app.service;
 import com.grouploja.basic_shirt_app.entiny.Produto;
 import com.grouploja.basic_shirt_app.repository.ProdutoRepositorio;
 import com.grouploja.basic_shirt_app.repository.CategoriaRepositorio;
+import com.grouploja.basic_shirt_app.repository.PedidoRepositorio;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,40 +18,49 @@ public class ProdutoServico {
 
     private final ProdutoRepositorio produtoRepositorio;
     private final CategoriaRepositorio categoriaRepositorio;
+    private final PedidoRepositorio pedidoRepositorio;
 
     public ProdutoServico(
             ProdutoRepositorio produtoRepositorio,
-            CategoriaRepositorio categoriaRepositorio) {
+            CategoriaRepositorio categoriaRepositorio,
+            PedidoRepositorio pedidoRepositorio) {
 
         this.produtoRepositorio = produtoRepositorio;
         this.categoriaRepositorio = categoriaRepositorio;
+        this.pedidoRepositorio = pedidoRepositorio;
     }
 
     //Salvar
+    @Transactional
     public Produto salvar(Produto produto) {
         validarProduto(produto);
+        produto.setNome(produto.getNome().trim());
+        produto.setAtivo(true);
         return produtoRepositorio.save(produto);
     }
 
     //Listar
+    @Transactional(readOnly = true)
     public List<Produto> listarTodos() {
-        return produtoRepositorio.findAll();
+        return produtoRepositorio.findByAtivoTrue();
     }
 
     //Buscar por ID
+    @Transactional(readOnly = true)
     public Optional<Produto> buscarPorId(Long id) {
-        return produtoRepositorio.findById(id);
+        return produtoRepositorio.findByIdAndAtivoTrue(id);
     }
 
     //Atualizar
+    @Transactional
     public Produto atualizar(Long id, Produto produto) {
 
-        Produto produtoExistente = produtoRepositorio.findById(id)
+        Produto produtoExistente = produtoRepositorio.findByIdAndAtivoTrue(id)
             .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
 
         validarProduto(produto);
 
-        produtoExistente.setNome(produto.getNome());
+        produtoExistente.setNome(produto.getNome().trim());
         produtoExistente.setDescricao(produto.getDescricao());
         produtoExistente.setPreco(produto.getPreco());
         produtoExistente.setEstoque(produto.getEstoque());
@@ -57,14 +69,17 @@ public class ProdutoServico {
         return produtoRepositorio.save(produtoExistente);
     }
 
-    //Deletar
+    //Deletar (exclusão lógica)
+    @Transactional
     public void excluir(Long id) {
 
-        if (!produtoRepositorio.existsById(id)) {
-            throw new ProdutoNaoEncontradoException(id);
-        }
+        Produto produto = produtoRepositorio.findByIdAndAtivoTrue(id)
+            .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
 
-        produtoRepositorio.deleteById(id);
+        // Desativa o produto sem apagar seu histórico
+        produto.setAtivo(false);
+
+        produtoRepositorio.save(produto);
     }
 
     //Validar produto
@@ -128,5 +143,7 @@ public class ProdutoServico {
         }
     }
 }
+
+
 
 

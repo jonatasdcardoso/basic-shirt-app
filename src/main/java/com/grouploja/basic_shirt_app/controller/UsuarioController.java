@@ -32,38 +32,59 @@ public class UsuarioController {
 
     // Criar usuário
     @PostMapping
-    public ResponseEntity<UsuarioResponse> criar(@Valid @RequestBody CriarUsuarioRequest request) {
-        Usuario novoUsuario = new Usuario(request.nome(), request.email(), request.senha());
+    public ResponseEntity<UsuarioResponse> criar(
+            @Valid @RequestBody CriarUsuarioRequest request) {
+
+        Usuario novoUsuario = new Usuario(
+            request.nome(),
+            request.email(),
+            request.senha()
+        );
+
         Usuario usuarioSalvo = usuarioServico.salvar(novoUsuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.converter(usuarioSalvo));
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(UsuarioResponse.converter(usuarioSalvo));
     }
 
-    // Listar todos usuários
+    // Listar todos os usuários
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> listarTodos() {
-        List<UsuarioResponse> usuarios = usuarioServico.listarTodos().stream()
+
+        List<UsuarioResponse> usuarios = usuarioServico.listarTodos()
+            .stream()
             .map(UsuarioResponse::converter)
             .toList();
+
         return ResponseEntity.ok(usuarios);
     }
 
-    // Buscar usuário usando ID
+    // Buscar usuário por ID
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponse> buscarPorId(
+            @PathVariable Long id) {
+
         Usuario usuario = usuarioServico.buscarPorId(id);
-        return ResponseEntity.ok(UsuarioResponse.converter(usuario));
+
+        return ResponseEntity.ok(
+            UsuarioResponse.converter(usuario));
     }
 
     // DTO de requisição
     public record CriarUsuarioRequest(
+
         @NotBlank(message = "O nome é obrigatório.")
         String nome,
+
         @NotBlank(message = "O e-mail é obrigatório.")
         @Email(message = "Informe um e-mail válido.")
         String email,
+
         @NotBlank(message = "A senha é obrigatória.")
         @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres.")
         String senha
+
     ) {
     }
 
@@ -74,7 +95,9 @@ public class UsuarioController {
         String email,
         PerfilUsuario perfil
     ) {
+
         public static UsuarioResponse converter(Usuario usuario) {
+
             return new UsuarioResponse(
                 usuario.getId(),
                 usuario.getNome(),

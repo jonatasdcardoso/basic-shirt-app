@@ -1,24 +1,23 @@
-
 package com.grouploja.basic_shirt_app.service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.grouploja.basic_shirt_app.entiny.Categoria;
 import com.grouploja.basic_shirt_app.repository.CategoriaRepositorio;
 import com.grouploja.basic_shirt_app.repository.ProdutoRepositorio;
 
-//CRUD
-
-@Service // Registra a classe no Spring Container
+// CRUD
+@Service
 public class CategoriaServico {
-    // Não pode ser modificada após a atribuicao
+
     private final CategoriaRepositorio categoriaRepositorio;
     private final ProdutoRepositorio produtoRepositorio;
 
-    //Construtor
     public CategoriaServico(
             CategoriaRepositorio categoriaRepositorio,
             ProdutoRepositorio produtoRepositorio) {
@@ -26,18 +25,32 @@ public class CategoriaServico {
         this.produtoRepositorio = produtoRepositorio;
     }
 
+    // Normalizar nome da categoria
+    private String normalizarNome(String nome) {
+        if (nome == null) {
+            return null;
+        }
+
+        return nome.trim();
+    }
+
     // Validar categoria
     private void validarCategoria(Categoria categoria) {
+        if (categoria == null) {
+            throw new IllegalArgumentException(
+                "Os dados da categoria são obrigatórios.");
+        }
 
-        if (categoria == null || categoria.getNome() == null ||
-            categoria.getNome().isBlank()) {
+        categoria.setNome(normalizarNome(categoria.getNome()));
 
+        if (categoria.getNome() == null || categoria.getNome().isBlank()) {
             throw new IllegalArgumentException(
                 "O nome da categoria é obrigatório.");
         }
     }
 
-    //Salvar
+    // Salvar
+    @Transactional
     public Categoria salvar(Categoria categoria) {
         validarCategoria(categoria);
 
@@ -49,17 +62,20 @@ public class CategoriaServico {
         return categoriaRepositorio.save(categoria);
     }
 
-    //Listar
-    public List<Categoria> listarTodas(){
+    // Listar todas
+    @Transactional(readOnly = true)
+    public List<Categoria> listarTodas() {
         return categoriaRepositorio.findAll();
     }
 
-    // Procurar por id (Opcional pra caso nao tenha Categoria no Id)
+    // Buscar por ID
+    @Transactional(readOnly = true)
     public Optional<Categoria> buscarPorId(Long id) {
         return categoriaRepositorio.findById(id);
     }
 
-    //Atualizar
+    // Atualizar
+    @Transactional
     public Categoria atualizar(Long id, Categoria categoria) {
 
         Categoria categoriaExistente = categoriaRepositorio.findById(id)
@@ -82,13 +98,14 @@ public class CategoriaServico {
         return categoriaRepositorio.save(categoriaExistente);
     }
 
-    //Deletar
+    // Excluir
+    @Transactional
     public void excluir(Long id) {
+
         if (!categoriaRepositorio.existsById(id)) {
             throw new CategoriaNaoEncontradaException(id);
         }
 
-        // Impede excluir categoria que possui produtos associados
         if (produtoRepositorio.existsByCategoriaId(id)) {
             throw new IllegalArgumentException(
                 "Não é possível excluir uma categoria que possui produtos.");
