@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Entrar')}">
+    <title>Entrar</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <section class="secao-auth" aria-labelledby="titulo-login">
+        <div class="cartao-branco">
+            <h1 id="titulo-login" class="titulo-serif">Entrar</h1>
+            <p class="subtitulo-suave">Acesse sua conta Basic Shirt para gerenciar seu carrinho e finalizar compras.</p>
+
+            <div th:replace="~{fragments/layout :: alertas}"></div>
+
+            <div class="alerta alerta-erro" role="alert" th:if="${param.error}">
+                E-mail ou senha inválidos. Verifique os dados e tente novamente.
+            </div>
+
+            <div class="alerta alerta-sucesso" role="status" th:if="${param.logout}">
+                Você saiu da sua conta com segurança.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="grupo-campo">
+                    <label for="email">E-mail</label>
+                    <input id="email"
+                           name="email"
+                           type="email"
+                           autocomplete="email"
+                           placeholder="seuemail@exemplo.com"
+                           required
+                           autofocus>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="senha">Senha</label>
+                    <input id="senha"
+                           name="senha"
+                           type="password"
+                           autocomplete="current-password"
+                           placeholder="Digite sua senha"
+                           required>
+                </div>
+
+                <button type="submit" class="botao-primario botao-largo">Entrar na Conta</button>
+            </form>
+
+            <div class="dica-credenciais" aria-label="Contas de demonstração">
+                <strong>Contas de homologação:</strong><br>
+                Cliente: <code>cliente@basicshirt.com</code> / <code>cliente123</code><br>
+                Admin: <code>admin@basicshirt.com</code> / <code>admin123</code>
+            </div>
+
+            <div class="rodape-auth">
+                Ainda não possui conta?
+                <a th:href="@{/cadastro}">Criar conta gratuitamente</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

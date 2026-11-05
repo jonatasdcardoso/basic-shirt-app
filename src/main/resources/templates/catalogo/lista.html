@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Catálogo')}">
+    <title>Catálogo</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <h1 class="titulo-pagina">Camisetas</h1>
+
+    <nav class="filtro" aria-label="Filtrar por categoria">
+        <a th:href="@{/catalogo}"
+           th:classappend="${categoriaSelecionada == null} ? 'ativo' : ''"
+           th:aria-current="${categoriaSelecionada == null} ? 'page'">Todas</a>
+        <a th:each="cat : ${categorias}"
+           th:href="@{/catalogo(categoriaId=${cat.id})}"
+           th:text="${cat.nome}"
+           th:classappend="${cat.id == categoriaSelecionada} ? 'ativo' : ''"
+           th:aria-current="${cat.id == categoriaSelecionada} ? 'page'">Categoria</a>
+    </nav>
+
+    <p class="aviso" th:if="${#lists.isEmpty(produtos)}">
+        Nenhum produto encontrado.
+    </p>
+
+    <ul class="grade-produtos" th:unless="${#lists.isEmpty(produtos)}">
+        <li class="cartao" th:each="prod : ${produtos}">
+            <article>
+                <a class="cartao-link" th:href="@{/catalogo/{id}(id=${prod.id})}">
+                    <div class="cartao-foto">
+                        <img th:src="@{/img/camiseta.svg}"
+                             th:alt="|Foto ilustrativa da camiseta ${prod.nome}|"
+                             alt="Foto ilustrativa da camiseta">
+                        <span class="selo-esgotado" th:if="${prod.estoque == 0}">Esgotado</span>
+                    </div>
+                    <h2 class="cartao-titulo" th:text="${prod.nome}">Nome do produto</h2>
+                </a>
+
+                <p class="cartao-categoria"
+                   th:text="${prod.categoria?.nome} ?: 'Sem categoria'">Categoria</p>
+
+                <p class="preco"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(prod.preco, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+
+                <a class="botao-ver-produto" th:href="@{/catalogo/{id}(id=${prod.id})}">Ver Produto</a>
+            </article>
+        </li>
+    </ul>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Criar Conta')}">
+    <title>Criar Conta</title>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" class="container">
+
+    <section class="secao-auth" aria-labelledby="titulo-cadastro">
+        <div class="cartao-branco">
+            <h1 id="titulo-cadastro" class="titulo-serif">Criar Conta</h1>
+            <p class="subtitulo-suave">Cadastre-se em segundos para salvar itens no carrinho e acompanhar seus pedidos.</p>
+
+            <div th:replace="~{fragments/layout :: alertas}"></div>
+
+            <form th:action="@{/cadastro}" th:object="${cadastroForm}" method="post" novalidate>
+                <div class="grupo-campo">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome"
+                           type="text"
+                           th:field="*{nome}"
+                           autocomplete="name"
+                           placeholder="Ex.: Maria Fernanda Silva"
+                           required>
+                    <span class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="email">E-mail</label>
+                    <input id="email"
+                           type="email"
+                           th:field="*{email}"
+                           autocomplete="email"
+                           placeholder="seuemail@exemplo.com"
+                           required>
+                    <span class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="senha">Senha (mínimo de 6 caracteres)</label>
+                    <input id="senha"
+                           type="password"
+                           th:field="*{senha}"
+                           autocomplete="new-password"
+                           placeholder="Crie uma senha segura"
+                           minlength="6"
+                           required>
+                    <span class="erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="confirmarSenha">Confirmar senha</label>
+                    <input id="confirmarSenha"
+                           type="password"
+                           th:field="*{confirmarSenha}"
+                           autocomplete="new-password"
+                           placeholder="Repita a senha criada"
+                           minlength="6"
+                           required>
+                    <span class="erro-campo" th:if="${#fields.hasErrors('confirmarSenha')}" th:errors="*{confirmarSenha}"></span>
+                </div>
+
+                <button type="submit" class="botao-primario botao-largo">Cadastrar Usuário</button>
+            </form>
+
+            <div class="rodape-auth">
+                Já tem cadastro?
+                <a th:href="@{/login}">Fazer login</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>
